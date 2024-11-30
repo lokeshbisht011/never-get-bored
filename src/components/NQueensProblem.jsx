@@ -57,8 +57,13 @@ export default function NQueensProblem() {
 
           // Mark horizontal and vertical lines
           for (let k = 0; k < newBoard.length; k++) {
-            attackedBoard[k][j].isAttacked = true; // Vertical
-            attackedBoard[i][k].isAttacked = true; // Horizontal
+            // Vertical attack marking (fixed column `j`, iterate over rows)
+            attackedBoard[k][j].isAttacked = true;
+          }
+
+          for (let k = 0; k < newBoard[0].length; k++) {
+            // Horizontal attack marking (fixed row `i`, iterate over columns)
+            attackedBoard[i][k].isAttacked = true;
           }
 
           // Mark diagonals
