@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-
 import confetti from "canvas-confetti";
 import NQueensControls from "./NQueensControls";
 import { useToast } from "@/hooks/use-toast";
@@ -16,11 +15,20 @@ export default function NQueensProblem() {
   const [board, setBoard] = useState([]);
   const [showAttacked, setShowAttacked] = useState(true);
   const [queenCount, setQueenCount] = useState(0);
+  const [isSquareGridEnabled, setIsSquareGridEnabled] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     resetBoard();
   }, [rows, cols]);
+
+  useEffect(() => {
+    if (isSquareGridEnabled) {
+      const gridSize = Math.min(rows, cols);
+      setRows(gridSize);
+      setCols(gridSize);
+    }
+  }, [isSquareGridEnabled]);
 
   const resetBoard = () => {
     const newBoard = Array(rows)
@@ -122,7 +130,8 @@ export default function NQueensProblem() {
         setRows={setRows}
         setCols={setCols}
         resetBoard={resetBoard}
-        setSquareGrid={() => setRows(Math.max(rows, cols))}
+        isSquareGridEnabled={isSquareGridEnabled}
+        setIsSquareGridEnabled={setIsSquareGridEnabled}
         showAttacked={showAttacked}
         setShowAttacked={setShowAttacked}
       />
