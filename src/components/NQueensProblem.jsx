@@ -10,31 +10,21 @@ const MIN_SIZE = 4;
 const MAX_SIZE = 12;
 
 export default function NQueensProblem() {
-  const [rows, setRows] = useState(8);
-  const [cols, setCols] = useState(8);
+  const [size, setSize] = useState(8); // Unified control for rows and columns
   const [board, setBoard] = useState([]);
   const [showAttacked, setShowAttacked] = useState(true);
   const [queenCount, setQueenCount] = useState(0);
-  const [isSquareGridEnabled, setIsSquareGridEnabled] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     resetBoard();
-  }, [rows, cols]);
-
-  useEffect(() => {
-    if (isSquareGridEnabled) {
-      const gridSize = Math.min(rows, cols);
-      setRows(gridSize);
-      setCols(gridSize);
-    }
-  }, [isSquareGridEnabled]);
+  }, [size]);
 
   const resetBoard = () => {
-    const newBoard = Array(rows)
+    const newBoard = Array(size)
       .fill(null)
       .map(() =>
-        Array(cols)
+        Array(size)
           .fill(null)
           .map(() => ({ hasQueen: false, isAttacked: false }))
       );
@@ -43,47 +33,25 @@ export default function NQueensProblem() {
   };
 
   const updateAttackedSquares = (newBoard) => {
-    // Create a fresh board with no attacked squares
     const attackedBoard = newBoard.map((row) =>
       row.map(() => ({ hasQueen: false, isAttacked: false }))
     );
 
-    // Traverse the board to find all queens
     for (let i = 0; i < newBoard.length; i++) {
       for (let j = 0; j < newBoard[i].length; j++) {
         if (newBoard[i][j].hasQueen) {
-          // Place the queen back on the new board
           attackedBoard[i][j].hasQueen = true;
 
-          // Mark horizontal and vertical lines
           for (let k = 0; k < newBoard.length; k++) {
-            // Vertical attack marking (fixed column `j`, iterate over rows)
-            attackedBoard[k][j].isAttacked = true;
+            attackedBoard[k][j].isAttacked = true; // Vertical
+            attackedBoard[i][k].isAttacked = true; // Horizontal
           }
 
-          for (let k = 0; k < newBoard[0].length; k++) {
-            // Horizontal attack marking (fixed row `i`, iterate over columns)
-            attackedBoard[i][k].isAttacked = true;
-          }
-
-          // Mark diagonals
-          for (
-            let k = 1;
-            k < Math.max(newBoard.length, newBoard[i].length);
-            k++
-          ) {
-            if (i + k < newBoard.length && j + k < newBoard[i].length) {
-              attackedBoard[i + k][j + k].isAttacked = true;
-            }
-            if (i - k >= 0 && j - k >= 0) {
-              attackedBoard[i - k][j - k].isAttacked = true; // Top-left diagonal
-            }
-            if (i + k < newBoard.length && j - k >= 0) {
-              attackedBoard[i + k][j - k].isAttacked = true; // Bottom-left diagonal
-            }
-            if (i - k >= 0 && j + k < newBoard[i].length) {
-              attackedBoard[i - k][j + k].isAttacked = true; // Top-right diagonal
-            }
+          for (let k = 1; k < size; k++) {
+            if (i + k < size && j + k < size) attackedBoard[i + k][j + k].isAttacked = true;
+            if (i - k >= 0 && j - k >= 0) attackedBoard[i - k][j - k].isAttacked = true;
+            if (i + k < size && j - k >= 0) attackedBoard[i + k][j - k].isAttacked = true;
+            if (i - k >= 0 && j + k < size) attackedBoard[i - k][j + k].isAttacked = true;
           }
         }
       }
@@ -106,7 +74,7 @@ export default function NQueensProblem() {
       : queenCount - 1;
     setQueenCount(newQueenCount);
 
-    if (newQueenCount === rows && isBoardSolved(updatedBoard)) {
+    if (newQueenCount === size && isBoardSolved(updatedBoard)) {
       celebrateSolution();
     }
   };
@@ -128,23 +96,20 @@ export default function NQueensProblem() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <h1 className="text-4xl font-bold mb-6">N-Queens Problem</h1>
+      <h1 className="text-2xl text-center mb-6">Can you place N queens on the board without any queen attacking any other.</h1>
 
       <NQueensControls
-        rows={rows}
-        cols={cols}
-        setRows={setRows}
-        setCols={setCols}
+        size={size}
+        setSize={setSize}
         resetBoard={resetBoard}
-        isSquareGridEnabled={isSquareGridEnabled}
-        setIsSquareGridEnabled={setIsSquareGridEnabled}
         showAttacked={showAttacked}
         setShowAttacked={setShowAttacked}
       />
 
       <NQueensBoard
         board={board}
-        rows={rows}
-        cols={cols}
+        rows={size}
+        cols={size}
         showAttacked={showAttacked}
         onSquareClick={handleSquareClick}
       />
